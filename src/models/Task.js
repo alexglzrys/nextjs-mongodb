@@ -1,4 +1,4 @@
-const { Schema } = require("mongoose");
+const { Schema, model, models } = require("mongoose");
 
 // Esquema o estructura del Documento referente a una Tarea
 const taskSchema = new Schema({
@@ -20,4 +20,5 @@ const taskSchema = new Schema({
     versionKey: false   // elimina el campo _v agregado por defecto en MongoDb
 });
 
-export default model('Task', taskSchema);
+// Evitar crear múltiples modelos cada vez que se invoca su uso, si existe lo regresamos 
+export default models.Task || model('Task', taskSchema);
