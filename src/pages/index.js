@@ -31,7 +31,7 @@ const HomePage = ({ tasks }) => {
               <p>{task.description}</p>
             </Card.Content>
             <Card.Content extra>
-              <Button color="green">Ver</Button>
+              <Button color="green" onClick={() => router.push(`/tasks/${task._id}`)}>Ver</Button>
               <Button color="orange">Editar</Button>
             </Card.Content>
           </Card>
