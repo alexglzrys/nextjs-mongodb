@@ -19,6 +19,16 @@ const TaskHandler = async(req, res) => {
             } catch (error) {
                 return res.status(500).json({message: error.message, error: true})
             }
+        case 'DELETE':
+            try {
+                // Localizar una tarea por su ID y proceder a eliminarla si existe
+                const deleted_task = await Task.findByIdAndDelete(id);
+                if (!deleted_task) return res.status(404).json({message: 'Tarea no localizada', error: true})
+                
+                return res.status(204).json()
+            } catch (error) {
+                return res.status(500).json({message: error.message, error: true})
+            }
         default:
             return res.status(500).json({message: 'Método HTTP no soportado', error: true})
     }
