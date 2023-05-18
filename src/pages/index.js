@@ -1,9 +1,12 @@
 import axios from "axios";
 import Image from "next/image";
+import { useRouter } from "next/router";
 import React from "react";
 import { Button, Container, Card, Grid } from "semantic-ui-react";
 
 const HomePage = ({ tasks }) => {
+  const router = new useRouter();
+
   // Componente a renderizar si no hay tareas
   if (!tasks.length) return <Grid centered verticalAlign="middle" columns={1} style={{"min-height": "100vh"}}>
     <Grid.Row>
@@ -11,7 +14,7 @@ const HomePage = ({ tasks }) => {
         <h3>No hay tareas registradas</h3>
         <Image src='https://michassi.com/assets/web//images/no_data_found.png' alt="No existen tareas" width={314} height={314} />
         <div>
-          <Button primary>Registrar una tarea</Button>
+          <Button primary onClick={() => router.push('/tasks/new') }>Registrar una tarea</Button>
         </div>
       </Grid.Column>
     </Grid.Row>
@@ -19,7 +22,7 @@ const HomePage = ({ tasks }) => {
 
   // Componente a renderizar cuando existen tareas
   return (
-    <Container>
+    <Container style={{padding: '2rem 0'}}>
       <Card.Group itemsPerRow={4}>
         {tasks.map((task) => (
           <Card key={task._id}>
