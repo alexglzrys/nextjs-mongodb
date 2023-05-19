@@ -32,7 +32,7 @@ const HomePage = ({ tasks }) => {
             </Card.Content>
             <Card.Content extra>
               <Button color="green" onClick={() => router.push(`/tasks/${task._id}`)}>Ver</Button>
-              <Button color="orange">Editar</Button>
+              <Button color="orange" onClick={() => router.push(`/tasks/${task._id}/edit`)}>Editar</Button>
             </Card.Content>
           </Card>
         ))}

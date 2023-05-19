@@ -1,8 +1,20 @@
 import axios from "axios";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { Button, Form, Grid } from "semantic-ui-react";
+
+/**
+ * Este componente de Página
+ * Se reutiliza en la página de actualización
+ * 
+ * Es por ello que internamente está atento a la exisrtencia del rotuer.query.id
+ * ya que si existe, se trata de una actualización
+ * http://locahost:3000/tasks/:id/edit
+ * 
+ * Si no existe, se trata de un registro
+ * http://localhost:3000/tasks
+ */
 
 const NewTaskPage = () => {
   const [newTask, setNewTask] = useState({
@@ -11,6 +23,27 @@ const NewTaskPage = () => {
   });
   const [errors, setErrors] = useState({})
   const router = useRouter();
+
+  const {id} = router.query
+  
+  // Efecto secundario para localizar infomación de la tarea a actyalizar
+  useEffect(() => {
+    (async( ) => {
+      try {
+        // Si existe un parametro de consulta en la URL, este formulario se muestra desde una página de edición 
+        if (id) {
+          const response = await axios.get(`http://localhost:3000/api/tasks/${id}`);
+          if (response.status == 200) {
+            setNewTask(response.data);
+          } else {
+            throw new Error(response.statusText)
+          }
+        }
+      } catch (error) {
+        router.push('/')
+      }
+    })();
+  }, [id, router]);
 
   // Función de validación de campos de formulario básica
   const validate = () => {
@@ -37,14 +70,30 @@ const NewTaskPage = () => {
             return;
         }
         setErrors({})
-        // Registrar tarea en base de datos
-        const {data} = await axios.post('/api/tasks', newTask);
-        toast.success('Tarea registrada en el sistema')
-        router.push('/');
+        if (id) {
+          // Actualizar tarea en base de datos
+          await updateTask()
+        } else {
+          // Registrar tarea en base de datos
+          await saveTask();
+        }
+       
     } catch (err) {
         toast.error(err.response.data)
     }
   };
+
+  const saveTask = async() => {
+    const {data} = await axios.post('/api/tasks', newTask);
+    toast.success('Tarea registrada en el sistema')
+    router.push('/');
+  }
+
+  const updateTask = async() => {
+    const {data} = await axios.put(`/api/tasks/${id}`, newTask);
+    toast.success('Tarea actualiza correctamente en el sistema')
+    router.push('/');
+  }
 
   return (
     <Grid
@@ -55,7 +104,7 @@ const NewTaskPage = () => {
     >
       <Grid.Row>
         <Grid.Column>
-          <h3>Registrar Nueva Tarea</h3>
+          <h3>{id ? 'Editar Tarea ' : 'Registrar Nueva Tarea'}</h3>
           <Form onSubmit={handleSubmit}>
             <Form.Input
               label="Titulo"
@@ -73,7 +122,7 @@ const NewTaskPage = () => {
               value={newTask.description}
               error={errors.description ? {content: errors.description} : null}
             />
-            <Button primary>Registrar</Button>
+            <Button primary>{id ? 'Actualizar' : 'Registrar'}</Button>
           </Form>
         </Grid.Column>
       </Grid.Row>
